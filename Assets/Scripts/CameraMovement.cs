@@ -15,16 +15,28 @@ public class CameraMovement : MonoBehaviour
     [Range(1f,100f)]
     [SerializeField] float touchDivider = 5f;
     float currentMagneticAngle = 0f;
-    [SerializeField] KalmanFilterSimple1D compasKalman;
-    [SerializeField] float f = 1;
-    [SerializeField] float h=1;
-    [SerializeField] float q=2;
-    [SerializeField] float r=15;
+    KalmanFilterSimple1D yawKalman;
+    KalmanFilterSimple1D pitchKalman;
+    KalmanFilterSimple1D rollKalman;
+    [SerializeField] float fy = 1;
+    [SerializeField] float hy = 1;
+    [SerializeField] float qy = 0.05f;
+    [SerializeField] float ry = 15;
     [SerializeField] float covariance = 0.1f;
+    [SerializeField] float fp = 1;
+    [SerializeField] float hp = 1;
+    [SerializeField] float qp = 2;
+    [SerializeField] float rp = 15;
+    [SerializeField] float fr = 1;
+    [SerializeField] float hr = 1;
+    [SerializeField] float qr = 1;
+    [SerializeField] float rr = 15;
     // Start is called before the first frame update
     void Start()
     {
-        compasKalman = new KalmanFilterSimple1D(q,r,f,h);   
+        yawKalman = new KalmanFilterSimple1D(qy,ry,fy,hy);
+        pitchKalman = new KalmanFilterSimple1D(qp, rp, fp, hp);
+        rollKalman = new KalmanFilterSimple1D(qr, rr, fr, hr);
     }
 
     // Update is called once per frame
@@ -44,11 +56,11 @@ public class CameraMovement : MonoBehaviour
                 AccelMangetometerModifyCamera();
             }
         }
-        f = (float) compasKalman.F;
-        h = (float) compasKalman.H;
-        q = (float) compasKalman.Q;
-        r = (float) compasKalman.R;
-        covariance = (float) compasKalman.Covariance;
+        fy = (float) yawKalman.F;
+        hy = (float) yawKalman.H;
+        qy = (float) yawKalman.Q;
+        ry = (float) yawKalman.R;
+        covariance = (float) yawKalman.Covariance;
 
     }
 
@@ -118,17 +130,27 @@ public class CameraMovement : MonoBehaviour
     {
         useTouchInput = !useTouchInput;
         Input.compass.enabled = true;
-        compasKalman.SetState(Input.compass.magneticHeading, covariance);
-        currentMagneticAngle = (float) compasKalman.State;
+        yawKalman.SetState(Input.compass.magneticHeading, covariance);
+        currentMagneticAngle = (float) yawKalman.State;
+        if (Input.acceleration.z > 0)
+            pitchKalman.SetState(Mathf.Asin(1f + Input.acceleration.y) * 180 / Mathf.PI, covariance);
+        else pitchKalman.SetState(Mathf.Asin(-(1f + Input.acceleration.y)) * 180 / Mathf.PI, covariance);
+        rollKalman.SetState(-Input.acceleration.x * 90f, covariance);
     }
 
     //Something is wrong here.
     void AccelMangetometerModifyCamera()
     {
+        //print($"{Input.acceleration.x} {Input.acceleration.y} {Input.acceleration.z}");
+        //print($"{transform.rotation.eulerAngles}");
         if (Input.acceleration.z < 0)
-            transform.rotation = Quaternion.AngleAxis((Input.acceleration.y +1f)* 40f, transform.right);
-        else transform.rotation = Quaternion.AngleAxis(-(Input.acceleration.y+1f )* 40f, transform.right);
-        compasKalman.Correct(Input.compass.magneticHeading);
-        transform.RotateAround(transform.position, Vector3.up, (float)compasKalman.State );
+            pitchKalman.Correct(Mathf.Asin(1f + Input.acceleration.y) * 180 / Mathf.PI);
+        else
+            pitchKalman.Correct(Mathf.Asin(-(1f + Input.acceleration.y)) * 180 / Mathf.PI);
+        transform.rotation = Quaternion.AngleAxis((float)pitchKalman.State, Vector3.right);
+        rollKalman.Correct(-Input.acceleration.x * 90f);
+        transform.RotateAround(transform.position, transform.forward, (float) rollKalman.State);
+        yawKalman.Correct(Input.compass.magneticHeading);
+        transform.RotateAround(transform.position, Vector3.up, (float)yawKalman.State );
     }
 }

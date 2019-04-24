@@ -736,11 +736,19 @@ MonoBehaviour:
   touchThreshold: 5
   touchFloatingResistance: 1
   touchDivider: 5
-  f: 1
-  h: 1
-  q: 0.1
-  r: 50
+  fy: 1
+  hy: 1
+  qy: 0.05
+  ry: 15
   covariance: 0.1
+  fp: 1
+  hp: 1
+  qp: 4
+  rp: 15
+  fr: 1
+  hr: 1
+  qr: 1
+  rr: 15
 --- !u!1 &789725154
 GameObject:
   m_ObjectHideFlags: 0
