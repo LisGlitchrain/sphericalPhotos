@@ -11,7 +11,7 @@ public class CameraMovement : MonoBehaviour
     [Range(0,50)]
     [SerializeField] float touchThreshold = 1f;
     [Range(0,50)]
-    [SerializeField] float touchFloatingResistance = 5f;
+    [SerializeField] float touchFloatingResistance = 0.05f;
     [Range(1f,100f)]
     [SerializeField] float touchDivider = 5f;
     float currentMagneticAngle = 0f;
@@ -77,8 +77,8 @@ public class CameraMovement : MonoBehaviour
                 if (touch.deltaPosition.magnitude > touchThreshold)
                 {
                     touchSpeedBiggerThenThreshold = true;
-                    xAngularSpeed = touch.deltaPosition.y / touchDivider;
-                    yAngularSpeed = -touch.deltaPosition.x / touchDivider;
+                    xAngularSpeed = (touch.deltaPosition.y / touchDivider ) / Time.deltaTime;
+                    yAngularSpeed = (-touch.deltaPosition.x / touchDivider) / Time.deltaTime;
                 }
                 else touchSpeedBiggerThenThreshold = false;
             }
@@ -99,7 +99,7 @@ public class CameraMovement : MonoBehaviour
     {
         if (Mathf.Abs(angularSpeed)> touchFloatingResistance)
         {
-            angularSpeed = Mathf.Lerp(angularSpeed, 0, 0.1f);
+            angularSpeed = Mathf.Lerp(angularSpeed, 0, touchFloatingResistance);
             //if (angularSpeed>0)
             //{
             //    angularSpeed -= touchFloatingResistance * Time.deltaTime;
@@ -141,8 +141,6 @@ public class CameraMovement : MonoBehaviour
     //Something is wrong here.
     void AccelMangetometerModifyCamera()
     {
-        //print($"{Input.acceleration.x} {Input.acceleration.y} {Input.acceleration.z}");
-        //print($"{transform.rotation.eulerAngles}");
         if (Input.acceleration.z < 0)
             pitchKalman.Correct(Mathf.Asin(1f + Input.acceleration.y) * 180 / Mathf.PI);
         else

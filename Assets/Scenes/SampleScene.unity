@@ -734,7 +734,7 @@ MonoBehaviour:
   yAngularSpeed: 0
   xAngularSpeed: 0
   touchThreshold: 5
-  touchFloatingResistance: 1
+  touchFloatingResistance: 0.05
   touchDivider: 5
   fy: 1
   hy: 1
@@ -743,11 +743,11 @@ MonoBehaviour:
   covariance: 0.1
   fp: 1
   hp: 1
-  qp: 4
+  qp: 0.1
   rp: 15
   fr: 1
   hr: 1
-  qr: 1
+  qr: 0.1
   rr: 15
 --- !u!1 &789725154
 GameObject:
