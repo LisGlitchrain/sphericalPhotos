@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    bool useTouchInput = true;
+    enum CameraMode { Touch, Gyro, VR}
+    CameraMode cameraMode = CameraMode.Touch;
+    [SerializeField] GameObject vrCamera;
     [SerializeField] float yAngularSpeed = 0f;
     [SerializeField] float xAngularSpeed = 0f;
     bool touchSpeedBiggerThenThreshold;
@@ -42,11 +44,11 @@ public class CameraMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (useTouchInput)
+        if (cameraMode == CameraMode.Touch)
         {
             TouchModifyCamera();
         }
-        else
+        else if (cameraMode == CameraMode.Gyro)
         {
             if ( SystemInfo.supportsGyroscope)
                 GyroModifyCamera();
@@ -98,21 +100,9 @@ public class CameraMovement : MonoBehaviour
     float DecreaseAngularSpeed(float angularSpeed)
     {
         if (Mathf.Abs(angularSpeed)> touchFloatingResistance)
-        {
             angularSpeed = Mathf.Lerp(angularSpeed, 0, touchFloatingResistance);
-            //if (angularSpeed>0)
-            //{
-            //    angularSpeed -= touchFloatingResistance * Time.deltaTime;
-            //}
-            //else
-            //{
-            //    angularSpeed += touchFloatingResistance * Time.deltaTime;
-            //}
-        }
         else
-        {
             angularSpeed = 0f;
-        }
         return angularSpeed;
     }
 
@@ -126,16 +116,34 @@ public class CameraMovement : MonoBehaviour
         return new Quaternion(q.x, q.y, -q.z, -q.w);
     }
 
-    public void ChangeCameraMode()
+    public void ChangeCameraModeToGyro()
     {
-        useTouchInput = !useTouchInput;
-        Input.compass.enabled = true;
-        yawKalman.SetState(Input.compass.magneticHeading, covariance);
-        currentMagneticAngle = (float) yawKalman.State;
-        if (Input.acceleration.z > 0)
-            pitchKalman.SetState(Mathf.Asin(1f + Input.acceleration.y) * 180 / Mathf.PI, covariance);
-        else pitchKalman.SetState(Mathf.Asin(-(1f + Input.acceleration.y)) * 180 / Mathf.PI, covariance);
-        rollKalman.SetState(-Input.acceleration.x * 90f, covariance);
+        if (cameraMode != CameraMode.Gyro)
+        {
+            cameraMode = CameraMode.Gyro;
+            Input.compass.enabled = true;
+            yawKalman.SetState(Input.compass.magneticHeading, covariance);
+            currentMagneticAngle = (float)yawKalman.State;
+            if (Input.acceleration.z > 0)
+                pitchKalman.SetState(Mathf.Asin(1f + Input.acceleration.y) * 180 / Mathf.PI, covariance);
+            else pitchKalman.SetState(Mathf.Asin(-(1f + Input.acceleration.y)) * 180 / Mathf.PI, covariance);
+            rollKalman.SetState(-Input.acceleration.x * 90f, covariance);
+            vrCamera?.SetActive(false);
+        }
+    }
+
+    public void ChangeCameraModeToTouch()
+    {
+        cameraMode = CameraMode.Touch;
+        vrCamera?.SetActive(false);
+
+    }
+
+    public void ChangeCameraModeToVR()
+    {
+        cameraMode = CameraMode.VR;
+        vrCamera?.SetActive(true);
+
     }
 
     //Something is wrong here.

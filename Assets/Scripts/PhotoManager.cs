@@ -36,12 +36,11 @@ public class PhotoManager : MonoBehaviour
             RenderSettings.skybox = defaultSkyBox;
             HideAllRenderers(false);
         }
-        else
-            if (skyboxPhotos.Count>0)
-            {
+        else if (skyboxPhotos.Count>0)
+        {
             RenderSettings.skybox = skyboxPhotos[photoSkyboxIndex];
             HideAllRenderers(true);       
-            }
+        }
         isSpherical = !isSpherical;
     }
 
