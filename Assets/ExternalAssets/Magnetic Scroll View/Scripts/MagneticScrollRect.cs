@@ -145,7 +145,7 @@ namespace MagneticScrollView
         //[SerializeField] private bool useIndexTable = false;
 #endif
         //PRIVATE NON-SERIALIZED
-
+        private bool orientationChanged;
         private float radius = 0;
         private float m_scrollAngle;
         //		private float globalOffsetAngle;
@@ -567,6 +567,12 @@ namespace MagneticScrollView
         #endregion
 
         #region Methods
+
+        public void ChangeOrientation()
+        {
+            orientationChanged = true;
+        }
+
         void Awake ()
         {
             //Debug.Log ("Awaken");           
@@ -591,7 +597,7 @@ namespace MagneticScrollView
 #endif
         }
 
-        private void Update ()
+        public void Update ()
         {
             // Debug.Log(GetNormalizedElementAngle(0, true));
             if (!isScrolling)
@@ -619,6 +625,13 @@ namespace MagneticScrollView
                 if (count != elements.Length)
                 {
                     AssignElements ();
+                }
+
+                if (orientationChanged)
+                {
+                    elements = new RectTransform[0];
+                    AssignElements();
+                    orientationChanged = false;
                 }
 
                 if (m_autoArranging)

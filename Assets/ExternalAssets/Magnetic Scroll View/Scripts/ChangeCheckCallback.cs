@@ -19,12 +19,12 @@ namespace MagneticScrollView
             hideFlags = HideFlags.HideInInspector;
         }
 
-        private void OnRectTransformDimensionsChange ()
-        {
-            // Debug.Log ("Dimension Changed", gameObject);
+        //private void OnRectTransformDimensionsChange ()
+        //{
+        //    // Debug.Log ("Dimension Changed", gameObject);
             
-            if (gameObject.activeInHierarchy && enabled && magneticScrollView != null)            
-                magneticScrollView.ArrangeElements ();
-        }
+        //    if (gameObject.activeInHierarchy && enabled && magneticScrollView != null)            
+        //        magneticScrollView.ArrangeElements ();
+        //}
     }
 }

@@ -14,7 +14,7 @@ public class PhotoLoader : MonoBehaviour
 
     GameObject panel;
     // Start is called before the first frame update
-    public void Start()
+    public void Load()
     {
         var obj = FindObjectOfType<CanvasGroup>().gameObject;
         if (obj.name == "Viewport")
@@ -28,7 +28,9 @@ public class PhotoLoader : MonoBehaviour
             localPanel.AddComponent<Image>();
             localPanel.GetComponent<Image>().sprite = raw;
             //print($"file: {raw.name} x:{raw.rect.width} y:{raw.rect.height}");
-            SetCorrectSizeToPanel(localPanel.GetComponent<RectTransform>(), obj.GetComponent<RectTransform>(), raw);
+            SetCorrectSizeToPanel(localPanel.GetComponent<RectTransform>(), viewport.GetComponent<RectTransform>(), raw);
+            //print($"view        x: {viewport.GetComponent<RectTransform>().rect.width} y: {viewport.GetComponent<RectTransform>().rect.height}");
+            //print($"localPanel: x: {localPanel.GetComponent<RectTransform>().rect.width} y: {localPanel.GetComponent<RectTransform>().rect.height} ");
         }
     }
 
