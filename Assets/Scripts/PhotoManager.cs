@@ -41,6 +41,7 @@ public class PhotoManager : MonoBehaviour
             Screen.autorotateToPortrait = true;
             Screen.autorotateToPortraitUpsideDown = true;
             Screen.orientation = ScreenOrientation.AutoRotation;
+            FindObjectOfType<Back>().currentWindow = Window.Magnetic;
             HideAllRenderers(false);
         }
         else if (skyboxPhotos.Count>0)
@@ -54,6 +55,8 @@ public class PhotoManager : MonoBehaviour
             Screen.autorotateToPortraitUpsideDown = false;
             Screen.orientation = ScreenOrientation.LandscapeLeft;
             Screen.orientation = ScreenOrientation.AutoRotation;
+            FindObjectOfType<Back>().currentWindow = Window.Spherical;
+
             HideAllRenderers(true);       
         }
         isSpherical = !isSpherical;

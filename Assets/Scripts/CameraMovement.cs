@@ -139,6 +139,7 @@ public class CameraMovement : MonoBehaviour
     {
         cameraMode = CameraMode.VR;
         vrCamera?.SetActive(true);
+        FindObjectOfType<Back>().currentWindow = Window.VR;
 
     }
 

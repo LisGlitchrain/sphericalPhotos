@@ -33,10 +33,12 @@ public class Back : MonoBehaviour
                 case Window.VR:
                     vrCamera.SetActive(false);
                     sphericalCamera.SetActive(true);
+                    currentWindow = Window.Spherical;
                     break;
                 case Window.Spherical:
                     break;
-
+                case Window.Magnetic:
+                    break;
             }
 
         }            
