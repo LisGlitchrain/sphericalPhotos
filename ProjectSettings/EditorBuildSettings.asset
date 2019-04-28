@@ -6,9 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MyMagicScroll.unity
-    guid: 0fa984e21d1d9b24082e6d4a45c2ec98
-  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: ba2b4480515d7854a9a4cc74f6e6ee7e
   m_configObjects: {}

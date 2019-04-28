@@ -926,6 +926,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57755c1a6b419804e80d3b0d94315e26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  magneticCamera: {fileID: 1962494697}
+  editorOrientation: 0
 --- !u!4 &1068963525
 Transform:
   m_ObjectHideFlags: 0

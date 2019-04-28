@@ -17,6 +17,8 @@ public class CameraMovement : MonoBehaviour
     [Range(1f,100f)]
     [SerializeField] float touchDivider = 5f;
     float currentMagneticAngle = 0f;
+    float prevMagneticAngle = 0f;
+    int fullCircles = 0;
     KalmanFilterSimple1D yawKalman;
     KalmanFilterSimple1D pitchKalman;
     KalmanFilterSimple1D rollKalman;
@@ -58,17 +60,11 @@ public class CameraMovement : MonoBehaviour
                 AccelMangetometerModifyCamera();
             }
         }
-        fy = (float) yawKalman.F;
-        hy = (float) yawKalman.H;
-        qy = (float) yawKalman.Q;
-        ry = (float) yawKalman.R;
-        covariance = (float) yawKalman.Covariance;
-
     }
 
     void TouchModifyCamera()
     {
-        print($"TouchCount {Input.touchCount} Bigger {touchSpeedBiggerThenThreshold} xAS {yAngularSpeed}");
+        //print($"TouchCount {Input.touchCount} Bigger {touchSpeedBiggerThenThreshold} xAS {yAngularSpeed}");
         if (Input.touchCount>0)
         {
             Touch touch = Input.GetTouch(0);
@@ -87,7 +83,7 @@ public class CameraMovement : MonoBehaviour
         }
         else if (touchSpeedBiggerThenThreshold)
         {
-            print($"{Mathf.Sqrt(xAngularSpeed * xAngularSpeed + yAngularSpeed * yAngularSpeed)} < {0.5f}");
+            //print($"{Mathf.Sqrt(xAngularSpeed * xAngularSpeed + yAngularSpeed * yAngularSpeed)} < {0.5f}");
             transform.RotateAround(transform.position, Vector3.up, yAngularSpeed* Time.deltaTime);
             transform.RotateAround(transform.position, transform.right, xAngularSpeed * Time.deltaTime);
             xAngularSpeed = DecreaseAngularSpeed(xAngularSpeed);
@@ -146,7 +142,6 @@ public class CameraMovement : MonoBehaviour
 
     }
 
-    //Something is wrong here.
     void AccelMangetometerModifyCamera()
     {
         if (Input.acceleration.z < 0)
@@ -156,7 +151,24 @@ public class CameraMovement : MonoBehaviour
         transform.rotation = Quaternion.AngleAxis((float)pitchKalman.State, Vector3.right);
         rollKalman.Correct(-Input.acceleration.x * 90f);
         transform.RotateAround(transform.position, transform.forward, (float) rollKalman.State);
-        yawKalman.Correct(Input.compass.magneticHeading);
+        fullCircles = CountFullCircles(fullCircles);
+        yawKalman.Correct(Input.compass.magneticHeading + fullCircles * 360f);       
         transform.RotateAround(transform.position, Vector3.up, (float)yawKalman.State );
     }
+
+    int CountFullCircles(int currentFullCircles)
+    {
+        print($"current circles {currentFullCircles}");
+        int fullCircles = currentFullCircles;
+        if (prevMagneticAngle < 90 &&
+            Input.compass.magneticHeading > 270)
+            fullCircles--;
+        else if (prevMagneticAngle > 270 &&
+            Input.compass.magneticHeading < 90)
+            fullCircles++;
+        print($"innerFull { fullCircles}");
+        prevMagneticAngle = Input.compass.magneticHeading;
+        return fullCircles;
+    }
+
 }

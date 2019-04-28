@@ -509,7 +509,15 @@ namespace MagneticScrollView
         public int CurrentSelectedIndex
         {
             get { return (int)Mathf.Repeat (m_currentSelected, elements.Length); }
-            private set { m_currentSelected = (int)Mathf.Repeat (value, elements.Length); }
+            set { m_currentSelected = (int)Mathf.Repeat (value, elements.Length); }
+        }
+
+        public void ForceCurrentSelectedIndexSet(int index)
+        {
+            m_currentSelected = index;
+            float indexAngle = -elementAngleOffset[m_currentSelected];
+            float targetAngle = (m_infiniteScrolling) ? ScrollAngle - MyMath.EnhancedRepeat(ScrollAngle - indexAngle, 90f) : indexAngle;
+            m_scrollAngle = targetAngle;
         }
 
         public GameObject CurrentSelectedObject
@@ -630,7 +638,7 @@ namespace MagneticScrollView
                 if (orientationChanged)
                 {
                     elements = new RectTransform[0];
-                    AssignElements();
+                    AssignElementsWithoutResetScroll();
                     orientationChanged = false;
                 }
 
@@ -725,6 +733,24 @@ namespace MagneticScrollView
 
             ArrangeElements ();
             ResetScroll ();
+        }
+
+        private void AssignElementsWithoutResetScroll()
+        {
+            //Debug.Log ("Assigning Elements");
+            if (viewport != null)
+            {
+                int count = ChildCount(viewport);
+                if (elements == null || elements.Length != count)
+                    elements = new RectTransform[count];
+
+                for (int i = 0; i < elements.Length; i++)
+                {
+                    elements[i] = viewport.transform.GetChild(i).GetComponent<RectTransform>();
+                }
+            }
+
+            ArrangeElements();
         }
 
         /// <summary>

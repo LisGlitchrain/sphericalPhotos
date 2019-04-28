@@ -5,16 +5,19 @@ using UnityEngine.UI;
 
 public class LandScapePortairSwitcher : MonoBehaviour
 {
+    [SerializeField] Camera magneticCamera;
+
     DeviceOrientation prevOrientation = DeviceOrientation.LandscapeLeft;
     float defaultAspectRatio;
     bool orientationChangedInPreviousFrame = false;
     GameObject viewport;
+    int photoIndex;
 
     // Start is called before the first frame update
     void Start()
     {
         FindObjectOfType<PhotoLoader>().Load();
-        defaultAspectRatio = Camera.main.aspect;
+        defaultAspectRatio = magneticCamera.aspect;
     }
 
     // Update is called once per frame
@@ -22,33 +25,44 @@ public class LandScapePortairSwitcher : MonoBehaviour
     {
         if (orientationChangedInPreviousFrame)
         {
-            FindObjectOfType<MagneticScrollView.MagneticScrollRect>().ChangeOrientation();
-            FindObjectOfType<MagneticScrollView.MagneticScrollRect>().Update();
+            FindObjectOfType<MagneticScrollView.MagneticScrollRect>().ChangeOrientation();          
             FindObjectOfType<PhotoLoader>().Load();
+            FindObjectOfType<MagneticScrollView.MagneticScrollRect>().Update();
+            print($"photo n {photoIndex}");
+            FindObjectOfType<MagneticScrollView.MagneticScrollRect>().ForceCurrentSelectedIndexSet(photoIndex);
             orientationChangedInPreviousFrame = false;
         }
-        if (Input.deviceOrientation != prevOrientation)
-        {
-            if (Input.deviceOrientation == DeviceOrientation.Portrait)
+        if (Input.deviceOrientation!= DeviceOrientation.FaceUp && 
+            Input.deviceOrientation != DeviceOrientation.FaceDown &&
+            Input.deviceOrientation != DeviceOrientation.Unknown)
+            if (Input.deviceOrientation != prevOrientation) 
             {
-                //print("Orientation has been changed!");
-                Camera.main.aspect = 1 / Camera.main.aspect;                    
+                //print($"{Input.deviceOrientation}");
+                //print($"screen {Screen.orientation}");
+                if (Input.deviceOrientation == DeviceOrientation.Portrait||
+                    Input.deviceOrientation == DeviceOrientation.PortraitUpsideDown)
+                {
+                    //print("Orientation has been changed!");
+                    magneticCamera.aspect = 1 / defaultAspectRatio;
+                    photoIndex = FindObjectOfType<MagneticScrollView.MagneticScrollRect>().CurrentSelectedIndex;
+                }
+                else if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft ||
+                    Input.deviceOrientation == DeviceOrientation.LandscapeRight)
+                {
+                    //print("2Orientation has been changed2!");
+                    photoIndex = FindObjectOfType<MagneticScrollView.MagneticScrollRect>().CurrentSelectedIndex;
+                    magneticCamera.ResetAspect();
+                }
+                GameObject obj = FindObjectOfType<CanvasGroup>().gameObject;
+                if (obj.name == "Viewport")
+                    viewport = obj;
+                for (var i = viewport.transform.childCount - 1; i >= 0; i--)
+                {
+                    DestroyImmediate(viewport.transform.GetChild(i).gameObject);
+                }
+                viewport.GetComponent<RectTransform>().ForceUpdateRectTransforms();
+                prevOrientation = Input.deviceOrientation;
+                orientationChangedInPreviousFrame = true;
             }
-            else if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft)
-            {
-                //print("2Orientation has been changed2!");
-                Camera.main.ResetAspect();
-            }
-            GameObject obj = FindObjectOfType<CanvasGroup>().gameObject;
-            if (obj.name == "Viewport")
-                viewport = obj;
-            for (var i = viewport.transform.childCount - 1; i >= 0; i--)
-            {
-                DestroyImmediate(viewport.transform.GetChild(i).gameObject);
-            }
-            viewport.GetComponent<RectTransform>().ForceUpdateRectTransforms();
-            prevOrientation = Input.deviceOrientation;
-            orientationChangedInPreviousFrame = true;
-        }
     }
 }
