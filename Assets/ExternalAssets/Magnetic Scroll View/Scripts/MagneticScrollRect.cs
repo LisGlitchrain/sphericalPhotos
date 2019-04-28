@@ -638,7 +638,7 @@ namespace MagneticScrollView
                 if (orientationChanged)
                 {
                     elements = new RectTransform[0];
-                    AssignElementsWithoutResetScroll();
+                    AssignElements();
                     orientationChanged = false;
                 }
 

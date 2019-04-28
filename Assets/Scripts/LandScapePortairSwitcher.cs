@@ -8,7 +8,6 @@ public class LandScapePortairSwitcher : MonoBehaviour
     [SerializeField] Camera magneticCamera;
 
     DeviceOrientation prevOrientation = DeviceOrientation.LandscapeLeft;
-    float defaultAspectRatio;
     bool orientationChangedInPreviousFrame = false;
     GameObject viewport;
     int photoIndex;
@@ -17,7 +16,6 @@ public class LandScapePortairSwitcher : MonoBehaviour
     void Start()
     {
         FindObjectOfType<PhotoLoader>().Load();
-        defaultAspectRatio = magneticCamera.aspect;
     }
 
     // Update is called once per frame
@@ -25,11 +23,11 @@ public class LandScapePortairSwitcher : MonoBehaviour
     {
         if (orientationChangedInPreviousFrame)
         {
-            FindObjectOfType<MagneticScrollView.MagneticScrollRect>().ChangeOrientation();          
-            FindObjectOfType<PhotoLoader>().Load();
+            FindObjectOfType<MagneticScrollView.MagneticScrollRect>().ChangeOrientation();      
             FindObjectOfType<MagneticScrollView.MagneticScrollRect>().Update();
-            print($"photo n {photoIndex}");
-            FindObjectOfType<MagneticScrollView.MagneticScrollRect>().ForceCurrentSelectedIndexSet(photoIndex);
+            FindObjectOfType<PhotoLoader>().Load();
+            //print($"photo n {photoIndex}");
+            //FindObjectOfType<MagneticScrollView.MagneticScrollRect>().ForceCurrentSelectedIndexSet(photoIndex);
             orientationChangedInPreviousFrame = false;
         }
         if (Input.deviceOrientation!= DeviceOrientation.FaceUp && 
@@ -37,22 +35,7 @@ public class LandScapePortairSwitcher : MonoBehaviour
             Input.deviceOrientation != DeviceOrientation.Unknown)
             if (Input.deviceOrientation != prevOrientation) 
             {
-                //print($"{Input.deviceOrientation}");
-                //print($"screen {Screen.orientation}");
-                if (Input.deviceOrientation == DeviceOrientation.Portrait||
-                    Input.deviceOrientation == DeviceOrientation.PortraitUpsideDown)
-                {
-                    //print("Orientation has been changed!");
-                    magneticCamera.aspect = 1 / defaultAspectRatio;
-                    photoIndex = FindObjectOfType<MagneticScrollView.MagneticScrollRect>().CurrentSelectedIndex;
-                }
-                else if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft ||
-                    Input.deviceOrientation == DeviceOrientation.LandscapeRight)
-                {
-                    //print("2Orientation has been changed2!");
-                    photoIndex = FindObjectOfType<MagneticScrollView.MagneticScrollRect>().CurrentSelectedIndex;
-                    magneticCamera.ResetAspect();
-                }
+                magneticCamera.ResetAspect();
                 GameObject obj = FindObjectOfType<CanvasGroup>().gameObject;
                 if (obj.name == "Viewport")
                     viewport = obj;
@@ -62,6 +45,8 @@ public class LandScapePortairSwitcher : MonoBehaviour
                 }
                 viewport.GetComponent<RectTransform>().ForceUpdateRectTransforms();
                 prevOrientation = Input.deviceOrientation;
+                FindObjectOfType<MagneticScrollView.MagneticScrollRect>().ChangeOrientation();
+                FindObjectOfType<MagneticScrollView.MagneticScrollRect>().Update();
                 orientationChangedInPreviousFrame = true;
             }
     }
