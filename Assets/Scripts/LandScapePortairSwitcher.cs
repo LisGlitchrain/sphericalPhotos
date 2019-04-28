@@ -23,6 +23,7 @@ public class LandScapePortairSwitcher : MonoBehaviour
     {
         if (orientationChangedInPreviousFrame)
         {
+            viewport.GetComponent<RectTransform>().ForceUpdateRectTransforms();
             FindObjectOfType<MagneticScrollView.MagneticScrollRect>().ChangeOrientation();      
             FindObjectOfType<MagneticScrollView.MagneticScrollRect>().Update();
             FindObjectOfType<PhotoLoader>().Load();
@@ -35,6 +36,7 @@ public class LandScapePortairSwitcher : MonoBehaviour
             Input.deviceOrientation != DeviceOrientation.Unknown)
             if (Input.deviceOrientation != prevOrientation) 
             {
+                //photoIndex = FindObjectOfType<MagneticScrollView.MagneticScrollRect>().CurrentSelectedIndex;
                 magneticCamera.ResetAspect();
                 GameObject obj = FindObjectOfType<CanvasGroup>().gameObject;
                 if (obj.name == "Viewport")
